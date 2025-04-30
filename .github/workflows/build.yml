@@ -1,0 +1,29 @@
+name: Build ConfuserEx
+   on: [push, pull_request]
+
+   jobs:
+     build:
+       runs-on: windows-latest
+       steps:
+         - name: Checkout Code
+           uses: actions/checkout@v4
+
+         - name: Setup .NET
+           uses: actions/setup-dotnet@v3
+           with:
+             dotnet-version: 6.0.x
+
+         - name: Restore & Build
+           run: |
+             msbuild ConfuserEx.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+         - name: Create Release ZIP
+           run: |
+             mkdir Artifacts
+             Compress-Archive -Path .\bin\Release\* -DestinationPath Artifacts\ConfuserEx-Modified.zip
+
+         - name: Upload Artifact
+           uses: actions/upload-artifact@v3
+           with:
+             name: ConfuserEx-Modified
+             path: Artifacts/ConfuserEx-Modified.zip
